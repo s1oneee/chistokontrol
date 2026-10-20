@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ЧистоКонтроль · Исполнитель</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F766E}a:hover{color:#115E59}
+button,textarea,input{font-family:inherit}
+</style>
+
+<style>
+html,body{margin:0;height:100%;background:#DDE3E0}
+.pt-bar{height:40px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;background:#17201C;color:#FFFFFF;font:500 14px 'Golos Text',system-ui,sans-serif}
+.pt-bar a{color:#9FE3D6;text-decoration:none;font-weight:600}
+.pt-bar span{opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app{display:flex;justify-content:center}
+#app>div{width:min(100vw,430px)!important;height:calc(100dvh - 40px)!important}
+@media (min-width:600px){
+  #app{padding:24px 0}
+  #app>div{width:390px!important;height:min(844px,calc(100dvh - 88px))!important;border-radius:28px;box-shadow:0 10px 40px rgba(0,0,0,.18)}
+}
+</style>
+</head>
+<body>
+<div class="pt-bar"><a href="index.html">‹ Все экраны</a><span>Исполнитель · демо</span></div>
+<div id="app"></div>
+<template id="tpl">
+
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F5F4; color: #17201C; font-family: 'Golos Text', system-ui, sans-serif; overflow: hidden">
+
+  <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 8px; background: #FFFFFF; border-bottom: 1px solid #E1E6E3">
+    <div style="width: 104px; display: flex">
+      <sc-if value="{{notList}}" hint-placeholder-val="{{false}}">
+        <button onClick="{{toList}}" style="height: 44px; padding: 0 8px 0 2px; border: 0; background: transparent; color: #0F766E; font-size: 16px; cursor: pointer; display: flex; align-items: center; gap: 2px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>Заказы</button>
+      </sc-if>
+    </div>
+    <div style="font-size: 16px; font-weight: 600">ЧистоКонтроль</div>
+    <div style="width: 104px; display: flex; justify-content: flex-end">
+      <button aria-label="Язык интерфейса" style="height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid #D5DDD9; background: #FFFFFF; color: #17201C; font-size: 13px; font-weight: 600; cursor: pointer">RU · UZ · TJ</button>
+    </div>
+  </div>
+
+  <sc-if value="{{isList}}" hint-placeholder-val="{{true}}">
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 20px 16px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="font-size: 14px; color: #4F5B56">Суббота, 19 октября</div>
+        <div style="font-size: 26px; font-weight: 700">Ольга, 2 заказа</div>
+      </div>
+      <sc-for list="{{orders}}" as="o" hint-placeholder-count="2">
+        <button onClick="{{o.open}}" style="width: 100%; text-align: left; border: 1px solid #E1E6E3; background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; color: #17201C">
+          <span style="display: flex; justify-content: space-between; align-items: center; width: 100%"><span style="font-size: 16px; font-weight: 600">{{o.time}}</span><span style="{{o.chipStyle}}">{{o.status}}</span></span>
+          <span style="font-size: 18px; font-weight: 600; line-height: 1.3">{{o.addr}}</span>
+          <span style="font-size: 14px; color: #4F5B56">{{o.summary}}</span>
+        </button>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isOrder}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="flex-shrink: 0; padding: 12px 16px 8px; background: #FFFFFF; border-bottom: 1px solid #E1E6E3; display: flex; flex-direction: column; gap: 8px">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px">
+          <div style="display: flex; flex-direction: column; gap: 1px; min-width: 0">
+            <span style="font-size: 13px; color: #4F5B56">Шаг {{stepNum}} из 6</span>
+            <span style="font-size: 18px; font-weight: 700">{{stepTitle}}</span>
+          </div>
+          <button onClick="{{openScope}}" style="height: 40px; padding: 0 12px; flex-shrink: 0; border-radius: 10px; border: 1px solid #D5DDD9; background: #FFFFFF; color: #0F766E; font-size: 14px; font-weight: 600; cursor: pointer">Что в заказе</button>
+        </div>
+        <div style="display: flex; gap: 4px">
+          <sc-for list="{{segs}}" as="sg" hint-placeholder-count="6">
+            <div style="{{sg.style}}"></div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 16px 96px; display: flex; flex-direction: column; gap: 12px">
+
+        <sc-if value="{{isBrief}}" hint-placeholder-val="{{true}}">
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 4px">
+              <span style="font-size: 14px; color: #4F5B56">{{cur.time}} · {{cur.type}}</span>
+              <span style="font-size: 20px; font-weight: 600; line-height: 1.25">{{cur.addr}}</span>
+              <span style="font-size: 15px"><strong style="font-weight: 600">Доступ:</strong> {{cur.access}}</span>
+            </div>
+            <div style="padding: 14px 16px; border-radius: 16px; background: #FDF1E6; color: #6E2E08; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em">Комментарий клиента</span>
+              <span style="font-size: 16px; line-height: 1.45">{{cur.comment}}</span>
+            </div>
+            <div style="padding: 14px 16px; border-radius: 16px; background: #EAF1F8; color: #1E4D7A; display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em">Осторожно</span>
+              <sc-for list="{{caution}}" as="cu" hint-placeholder-count="1">
+                <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 15px; font-weight: 600">{{cu.label}}</span><span style="font-size: 14px">{{cu.detail}}</span></div>
+              </sc-for>
+              <sc-for list="{{existing}}" as="ex" hint-placeholder-count="1">
+                <div style="display: flex; flex-direction: column; gap: 1px"><span style="font-size: 15px; font-weight: 600">Уже повреждено: {{ex.label}}</span><span style="font-size: 14px">{{ex.detail}}</span></div>
+              </sc-for>
+            </div>
+            <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px">
+              <span style="font-size: 13px; font-weight: 700; color: #4F5B56; text-transform: uppercase; letter-spacing: 0.04em">Взять с собой</span>
+              <sc-for list="{{take}}" as="tk" hint-placeholder-count="3">
+                <span style="font-size: 15px">· {{tk.label}}</span>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isArrive}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+            <div style="width: 72px; height: 72px; border-radius: 999px; background: #DDF0EC; color: #0F766E; display: flex; align-items: center; justify-content: center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></div>
+            <span style="font-size: 20px; font-weight: 600; line-height: 1.3">{{cur.addr}}</span>
+            <span style="font-size: 15px; color: #3F4A45">Начало в {{cur.time}} · {{cur.access}}</span>
+            <span style="font-size: 14px; color: #4F5B56; line-height: 1.4">Когда войдёте в квартиру, нажмите «Я на месте». Время и геолокация сохранятся сами.</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isPhotosBefore}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+            <span style="font-size: 15px; color: #3F4A45; line-height: 1.4">Сфотографируйте всё <strong>до начала работы</strong>. Нажмите на плитку, чтобы сделать фото.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #0F766E">{{beforeCount}} из {{beforeTotal}}</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+              <sc-for list="{{beforeZones}}" as="z" hint-placeholder-count="6">
+                <button onClick="{{z.shoot}}" aria-pressed="{{z.on}}" style="{{z.style}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3l2-3h8l2 3h3v11H3z"></path><circle cx="12" cy="13" r="4"></circle></svg><span>{{z.label}}</span></button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isVolume}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+            <span style="font-size: 16px; line-height: 1.4">Площадь и количество окон совпадают с заказом?</span>
+            <div style="display: flex; justify-content: space-between; font-size: 15px; padding: 10px 12px; border-radius: 12px; background: #F3F5F4"><span>В заказе</span><strong style="font-weight: 600">{{cur.area}} м² · окна {{cur.windows}} · {{totalText}} ₽</strong></div>
+            <sc-if value="{{volAsk}}" hint-placeholder-val="{{true}}">
+              <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                <button onClick="{{volSame}}" style="height: 56px; border-radius: 12px; border: 1.5px solid #0F766E; background: #FFFFFF; color: #0F766E; font-size: 16px; font-weight: 600; cursor: pointer">Да, совпадает</button>
+                <button onClick="{{volEdit}}" style="height: 56px; border-radius: 12px; border: 1.5px solid #C2702F; background: #FFFFFF; color: #8A3A0B; font-size: 16px; font-weight: 600; cursor: pointer">Нет, другое</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{volEditing}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 6px">
+                <div style="display: flex; align-items: center; justify-content: space-between; min-height: 52px">
+                  <span style="font-size: 16px; font-weight: 600">Площадь</span>
+                  <div style="display: flex; align-items: center; gap: 6px">
+                    <button onClick="{{areaMinus}}" aria-label="Меньше" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 22px; color: #0F766E; cursor: pointer">−</button>
+                    <span style="min-width: 64px; text-align: center; font-size: 17px; font-weight: 600">{{area}} м²</span>
+                    <button onClick="{{areaPlus}}" aria-label="Больше" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 22px; color: #0F766E; cursor: pointer">+</button>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; min-height: 52px">
+                  <span style="font-size: 16px; font-weight: 600">Окна</span>
+                  <div style="display: flex; align-items: center; gap: 6px">
+                    <button onClick="{{winMinus}}" aria-label="Меньше окон" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 22px; color: #0F766E; cursor: pointer">−</button>
+                    <span style="min-width: 64px; text-align: center; font-size: 17px; font-weight: 600">{{windows}} шт.</span>
+                    <button onClick="{{winPlus}}" aria-label="Больше окон" style="width: 48px; height: 48px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 22px; color: #0F766E; cursor: pointer">+</button>
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; padding: 12px; border-radius: 12px; background: #FDF1E6; color: #6E2E08"><span>Новая сумма</span><span>{{newTotalText}} ₽</span></div>
+                <span style="font-size: 13px; color: #4F5B56">Пересчитано по прайсу. Фото «до» приложатся автоматически.</span>
+                <button onClick="{{sendChange}}" style="height: 52px; border: 0; border-radius: 14px; background: #0F766E; color: #FFFFFF; font-size: 16px; font-weight: 600; cursor: pointer">Отправить клиенту</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{volSent}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <div style="padding: 12px; border-radius: 12px; background: #FDF1E6; color: #6E2E08; font-size: 15px; line-height: 1.4">Клиент получил расчёт {{newTotalText}} ₽ с фото. Ждём подтверждения. Изменение больше 10% — руководитель тоже видит.</div>
+                <button onClick="{{clientConfirmed}}" style="height: 44px; border: 1.5px dashed #8FA39B; border-radius: 12px; background: #F7F9F8; color: #3F4A45; font-size: 14px; font-weight: 600; cursor: pointer">Демо: клиент подтвердил →</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{volDone}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 16px; padding: 12px; border-radius: 12px; background: #DDF0EC; color: #0F4F49"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg><span>{{volDoneText}}</span></div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isChecklist}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 12px 16px; display: flex; flex-direction: column; gap: 2px">
+            <div style="display: flex; gap: 10px; align-items: center; padding: 10px 12px; margin: 4px 0 8px; border-radius: 12px; background: #DDF0EC; color: #0F4F49">
+              <span style="width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px; background: #0F766E; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></span>
+              <span style="font-size: 15px; line-height: 1.35"><strong style="font-weight: 600">Сделали пункт — нажмите на него.</strong> Отмечайте по ходу работы, а не всё в конце.</span>
+            </div>
+            <span style="font-size: 14px; font-weight: 600; color: #0F766E; padding: 0 0 6px">Сделано {{checkedCount}} из {{checkTotal}}</span>
+            <sc-for list="{{checks}}" as="c" hint-placeholder-count="6">
+              <button onClick="{{c.toggle}}" aria-pressed="{{c.checked}}" style="width: 100%; min-height: 56px; border: 0; border-bottom: 1px solid #EDF0EE; background: transparent; padding: 8px 0; display: flex; align-items: center; gap: 12px; text-align: left; cursor: pointer; color: #17201C">
+                <span style="{{c.boxStyle}}"><sc-if value="{{c.checked}}" hint-placeholder-val="{{false}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></sc-if></span>
+                <span style="display: flex; flex-direction: column; gap: 1px"><span style="{{c.labelStyle}}">{{c.label}}</span><span style="font-size: 13px; color: #4F5B56">{{c.detail}}</span></span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isPhotosAfter}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+            <span style="font-size: 15px; color: #3F4A45; line-height: 1.4">Сфотографируйте результат. Эти фото клиент получит в отчёте.</span>
+            <span style="font-size: 14px; font-weight: 600; color: #0F766E">{{afterCount}} из {{afterTotal}}</span>
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+              <sc-for list="{{afterZones}}" as="z" hint-placeholder-count="6">
+                <button onClick="{{z.shoot}}" aria-pressed="{{z.on}}" style="{{z.style}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3l2-3h8l2 3h3v11H3z"></path><circle cx="12" cy="13" r="4"></circle></svg><span>{{z.label}}</span></button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="flex-shrink: 0; padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #E1E6E3; display: flex; align-items: center; gap: 10px">
+        <sc-if value="{{canPrev}}" hint-placeholder-val="{{false}}">
+          <button onClick="{{prev}}" aria-label="Предыдущий шаг" style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 14px; border: 1px solid #D5DDD9; background: #FFFFFF; color: #17201C; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+        </sc-if>
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+          <button onClick="{{primary}}" style="{{primaryStyle}}">{{primaryLabel}}</button>
+          <sc-if value="{{hasHint}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 13px; color: #4F5B56; text-align: center">{{hint}}</span>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="position: absolute; right: 16px; bottom: 116px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px">
+        <sc-if value="{{showChatFab}}" hint-placeholder-val="{{true}}">
+          <button onClick="{{openChat}}" style="position: relative; height: 48px; padding: 0 18px 0 14px; border-radius: 999px; border: 0; background: #0F766E; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.18)">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"></path></svg><span>Чат</span>
+            <sc-if value="{{unread}}" hint-placeholder-val="{{true}}"><span style="position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; border-radius: 999px; background: #C2410C; color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid #FFFFFF">1</span></sc-if>
+          </button>
+        </sc-if>
+        <sc-if value="{{showDamageFab}}" hint-placeholder-val="{{false}}">
+          <button onClick="{{openDamage}}" style="height: 48px; padding: 0 18px 0 14px; border-radius: 999px; border: 0; background: #8A3A0B; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.18)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l9.5 17h-19z"></path><path d="M12 10v4"></path><path d="M12 17.5v.01"></path></svg><span>Повреждение</span></button>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{sheetOpen}}" hint-placeholder-val="{{false}}">
+        <div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: rgba(23,32,28,0.45); display: flex; flex-direction: column; justify-content: flex-end">
+          <div style="max-height: 82%; overflow-y: auto; background: #FFFFFF; border-radius: 20px 20px 0 0; padding: 16px 16px 24px; display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <span style="font-size: 18px; font-weight: 700">{{sheetTitle}}</span>
+              <button onClick="{{closeSheet}}" aria-label="Закрыть" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; color: #17201C; font-size: 20px; cursor: pointer">×</button>
+            </div>
+
+            <sc-if value="{{sheetScope}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 8px">
+                <sc-for list="{{scope}}" as="sc" hint-placeholder-count="4">
+                  <div style="display: flex; justify-content: space-between; gap: 10px; font-size: 15px; padding: 8px 0; border-bottom: 1px solid #EDF0EE"><span>{{sc.label}}</span><span style="color: #4F5B56; text-align: right">{{sc.qty}}</span></div>
+                </sc-for>
+                <span style="font-size: 15px; padding-top: 4px"><strong style="font-weight: 600">Комментарий:</strong> {{cur.comment}}</span>
+                <span style="font-size: 15px"><strong style="font-weight: 600">Доступ:</strong> {{cur.access}}</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{sheetChat}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 10px">
+                <sc-for list="{{wthread}}" as="m" hint-placeholder-count="2">
+                  <div style="{{m.style}}">
+                    <span style="font-size: 12px; font-weight: 600; color: #4F5B56">{{m.who}} · {{m.time}}</span>
+                    <span style="font-size: 15px; line-height: 1.4">{{m.text}}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{canReply}}" hint-placeholder-val="{{true}}">
+                  <button onClick="{{reply}}" style="height: 52px; border: 0; border-radius: 12px; background: #0F766E; color: #FFFFFF; font-size: 16px; font-weight: 600; cursor: pointer">Ответить: «Да, сделаю»</button>
+                  <span style="font-size: 13px; color: #4F5B56">Пункт сразу добавится в чек-лист.</span>
+                </sc-if>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{sheetDamage}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; flex-direction: column; gap: 12px">
+                <sc-if value="{{dmgForm}}" hint-placeholder-val="{{true}}">
+                  <div style="display: flex; flex-direction: column; gap: 12px">
+                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+                      <sc-for list="{{dmgWhoOpts}}" as="dw" hint-placeholder-count="2">
+                        <button onClick="{{dw.pick}}" aria-pressed="{{dw.on}}" style="{{dw.style}}">{{dw.label}}</button>
+                      </sc-for>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                      <sc-for list="{{dmgCats}}" as="dc" hint-placeholder-count="5">
+                        <button onClick="{{dc.pick}}" aria-pressed="{{dc.on}}" style="{{dc.style}}">{{dc.label}}</button>
+                      </sc-for>
+                    </div>
+                    <span style="font-size: 14px; font-weight: 600; color: #8A3A0B">Фото: {{dmgPhotoCount}} из 2 обязательно</span>
+                    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+                      <sc-for list="{{dmgPhotos}}" as="dp" hint-placeholder-count="3">
+                        <button onClick="{{dp.shoot}}" aria-pressed="{{dp.on}}" style="{{dp.style}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3l2-3h8l2 3h3v11H3z"></path><circle cx="12" cy="13" r="4"></circle></svg><span>{{dp.label}}</span></button>
+                      </sc-for>
+                    </div>
+                    <label for="dmg-text" style="font-size: 15px; font-weight: 600">Коротко, что случилось</label>
+                    <textarea id="dmg-text" rows="2" value="{{dmgText}}" onChange="{{setDmgText}}" style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 15px; line-height: 1.4; resize: none; color: #17201C"></textarea>
+                    <button onClick="{{sendDamage}}" style="{{dmgSendStyle}}">{{dmgSendLabel}}</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{dmgSent}}" hint-placeholder-val="{{false}}">
+                  <div style="padding: 14px; border-radius: 14px; background: #FDF1E6; color: #6E2E08; display: flex; flex-direction: column; gap: 8px">
+                    <span style="font-size: 16px; font-weight: 700">Отправлено руководителю · 10:58</span>
+                    <span style="font-size: 15px; line-height: 1.4">{{dmgSummary}}</span>
+                    <span style="font-size: 15px; line-height: 1.4">Сергей свяжется с клиенткой сам. Продолжайте уборку и ничего не обещайте от имени компании.</span>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; padding: 24px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center">
+      <div style="width: 84px; height: 84px; border-radius: 999px; background: #0F766E; display: flex; align-items: center; justify-content: center"><svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></div>
+      <div style="font-size: 24px; font-weight: 700">Заказ завершён</div>
+      <div style="font-size: 16px; color: #3F4A45; line-height: 1.45; max-width: 300px">Клиент получил фотоотчёт. Итог {{finalText}} ₽.</div>
+      <div style="width: 100%; box-sizing: border-box; background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; text-align: left">
+        <span style="font-size: 16px; font-weight: 700">Оплата клиента</span>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px">
+          <sc-for list="{{payWays}}" as="pw" hint-placeholder-count="2">
+            <button onClick="{{pw.pick}}" aria-pressed="{{pw.on}}" style="{{pw.style}}">{{pw.label}}</button>
+          </sc-for>
+        </div>
+        <sc-if value="{{payCashOpen}}" hint-placeholder-val="{{true}}">
+          <button onClick="{{gotCash}}" style="height: 56px; border: 0; border-radius: 14px; background: #0F766E; color: #FFFFFF; font-size: 16px; font-weight: 600; cursor: pointer">Получил(а) {{finalText}} ₽ наличными</button>
+          <span style="font-size: 13px; color: #4F5B56; line-height: 1.4">Пересчитайте при клиенте. После отметки ему придёт подтверждение и чек.</span>
+        </sc-if>
+        <sc-if value="{{payCashDone}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 12px; border-radius: 12px; background: #FDF1E6; color: #6E2E08; font-size: 14px; line-height: 1.4"><strong style="font-weight: 600">✓ Наличные у вас: {{finalText}} ₽.</strong> Сдайте их руководителю — сумма уже видна ему в «Наличные у исполнителей».</div>
+        </sc-if>
+        <sc-if value="{{paySbp}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 12px; border-radius: 12px; background: #DDF0EC; color: #0F4F49; font-size: 14px; line-height: 1.4">Клиент платит по QR-коду на счёт компании. Отмечать ничего не нужно — деньги не проходят через вас.</div>
+        </sc-if>
+      </div>
+      <button onClick="{{toList}}" style="width: 100%; height: 56px; margin-top: 8px; border: 0; border-radius: 14px; background: #0F766E; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">К заказам</button>
+    </div>
+  </sc-if>
+
+</div>
+</template>
+<script>window.__PAGE_MAP__ = {"Main":"client.html","Worker":"worker.html","Owner":"owner.html","Company":"company.html"};</script>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { screen: 'list', cur: 'o1', done: {}, ...this.fresh('o1') };
+  }
+  fresh(id) {
+    const o = this.orderData().find((x) => x.id === id);
+    return { step: 0, before: {}, after: {}, vol: 'ask', area: o.area, windows: o.windows, checks: {}, sheet: null,
+      damage: 'none', dmgWho: 'us', dmgCat: 'light', dmgPhotos: {}, dmgText: 'Треснул плафон люстры в комнате, когда протирала.', replied: false, payWay: 'cash', payGot: false };
+  }
+  orderData() {
+    return [
+      { id: 'o1', time: '10:00', addr: 'ул. Республики, 92, кв. 41', type: 'Генеральная', rate: 170, area: 55, windows: 4, winPrice: 600,
+        extras: [{ label: 'Духовка', detail: 'внутри, стекло, противень', price: 900 }, { label: 'Холодильник', detail: 'полки, ящики, уплотнитель', price: 900 }, { label: 'Балкон', detail: 'добавлено по комментарию клиента', price: 1500 }], pets: true,
+        comment: 'Кот — не выпускать на лестницу. На плитке в ванной остатки старого герметика. Если получится, помойте и балкон.', access: 'ключи у консьержа, клиентки не будет дома',
+        fromComment: [{ label: 'Санузел: старый герметик', detail: 'снять с плитки — из комментария клиента' }],
+        caution: [{ label: 'Глянцевые фасады на кухне', detail: 'только мягкая микрофибра, без абразивов и меламиновых губок' }],
+        existing: [{ label: 'скол на столешнице у мойки', detail: 'есть фото клиентки — сфотографируйте его отдельно на шаге «Фото до»' }],
+        take: ['Средство против герметика — по комментарию', 'Средство для стёкол и скребок', 'Обезжириватель для духовки', 'Пылесос со щёткой для шерсти', 'Стремянка'], hasThread: true },
+      { id: 'o2', time: '15:00', addr: 'ул. Мельникайте, 106, кв. 12', type: 'Поддерживающая', rate: 100, area: 42, windows: 0, winPrice: 600,
+        extras: [{ label: 'Микроволновка', detail: 'внутри и снаружи', price: 600 }], pets: false,
+        comment: 'Работаю в дальней комнате — её не убирать, пожалуйста.', access: 'клиент дома',
+        fromComment: [], caution: [{ label: 'Паркет', detail: 'хорошо отжатой тряпкой, без пара' }], existing: [],
+        take: ['Стандартный набор', 'Средство для микроволновки'], hasThread: false }
+    ];
+  }
+  renderVals() {
+    const s = this.state;
+    const set = (p) => this.setState(p);
+    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const ORDERS = this.orderData();
+    const cur = ORDERS.find((o) => o.id === s.cur);
+    const price = (o, area, windows) => area * o.rate + windows * o.winPrice + o.extras.reduce((a, e) => a + e.price, 0) + (o.pets ? 500 : 0);
+    const chip = (bg, fg) => 'font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; background: ' + bg + '; color: ' + fg;
+
+    const orders = ORDERS.map((o) => {
+      const isCur = o.id === s.cur;
+      let status = 'Запланирован', st = chip('#EDF0EE', '#4F5B56');
+      if (s.done[o.id]) { status = 'Выполнен'; st = chip('#DDF0EC', '#0F5F58'); }
+      else if (isCur && s.step >= 2) { status = 'На объекте'; st = chip('#FDEBDD', '#8A3A0B'); }
+      const parts = [o.type, o.area + ' м²'];
+      if (o.windows) parts.push('окна ' + o.windows);
+      o.extras.forEach((e) => parts.push(e.label.toLowerCase()));
+      return { time: o.time, addr: o.addr, summary: parts.join(' · '), status, chipStyle: st,
+        open: () => set(isCur ? { screen: s.done[o.id] ? 'done' : 'order' } : { screen: 'order', cur: o.id, ...this.fresh(o.id) }) };
+    });
+
+    const scope = [{ label: cur.type + ' уборка', qty: cur.area + ' м²' }];
+    if (cur.windows) scope.push({ label: 'Окна с двух сторон', qty: cur.windows + ' шт.' });
+    cur.extras.forEach((e) => scope.push({ label: e.label, qty: e.detail }));
+    if (cur.pets) scope.push({ label: 'Уборка за питомцем', qty: 'шерсть, лоток' });
+
+    const base = cur.type === 'Генеральная'
+      ? [{ label: 'Пыль везде', detail: 'верх шкафов, плинтусы, батареи, карнизы' }, { label: 'Кухня', detail: 'фартук и швы, фасады — мягкой микрофиброй' }, { label: 'Санузел', detail: 'сантехника, плитка, швы, зеркала' }, { label: 'Полы', detail: 'пылесос и влажная уборка, под лёгкой мебелью' }]
+      : [{ label: 'Пыль с открытых поверхностей', detail: 'столы, полки, подоконники' }, { label: 'Кухня и санузел', detail: 'поверхности и сантехника' }, { label: 'Полы', detail: 'кроме дальней комнаты' }];
+    const items = base.slice();
+    if (s.windows) items.push({ label: 'Окна (' + s.windows + ' шт.)', detail: 'стекло, рамы, уплотнители, подоконники' });
+    cur.extras.forEach((e) => items.push({ label: e.label, detail: e.detail }));
+    if (cur.pets) items.push({ label: 'За питомцем', detail: 'шерсть с мебели, место лотка' });
+    cur.fromComment.forEach((it) => items.push(it));
+    if (s.replied) items.push({ label: 'Подоконник на кухне', detail: 'просьба клиента в чате, 10:40' });
+    const checks = items.map((it, i) => {
+      const on = !!s.checks[i];
+      return { label: it.label, detail: it.detail, checked: on,
+        boxStyle: 'width: 28px; height: 28px; flex-shrink: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; ' + (on ? 'background: #0F766E' : 'background: #FFFFFF; border: 2px solid #A9B7B1'),
+        labelStyle: 'font-size: 16px; font-weight: 600; color: ' + (on ? '#4F5B56' : '#17201C'),
+        toggle: () => set({ checks: { ...this.state.checks, [i]: !this.state.checks[i] } }) };
+    });
+    const checkedCount = checks.filter((c) => c.checked).length;
+
+    const ZONES = (cur.type ? ['Кухня', 'Санузел', 'Комната'] : []).concat(s.windows > 0 ? ['Окна'] : []).concat(cur.extras.map((e) => e.label));
+    const BEFORE_ZONES = ZONES.concat(cur.existing.length ? ['Скол на столешнице'] : []);
+    const zoneStyle = (on, after) => 'height: 84px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 13px; cursor: pointer; text-align: center; padding: 4px; ' + (on ? (after ? 'background: #CDE7E1; color: #134E48; border: 1px solid #9FCFC4' : 'background: #E4E0D7; color: #4A443A; border: 1px solid #CFC8B9') : 'background: #F7F9F8; color: #0F766E; border: 1.5px dashed #8FA39B');
+    const zones = (key, list, after) => list.map((label) => ({ label, on: !!s[key][label], style: zoneStyle(!!s[key][label], after), shoot: () => set({ [key]: { ...this.state[key], [label]: true } }) }));
+    const beforeCount = BEFORE_ZONES.filter((z) => s.before[z]).length;
+    const afterCount = ZONES.filter((z) => s.after[z]).length;
+
+    const total = price(cur, cur.area, cur.windows);
+    const newTotal = price(cur, s.area, s.windows);
+    const volOk = s.vol === 'same' || s.vol === 'confirmed';
+    const final = s.vol === 'confirmed' ? newTotal : total;
+
+    const TITLES = ['Перед выездом', 'Прибытие', 'Фото до начала', 'Проверка объёма', 'Чек-лист', 'Фото после'];
+    const step = s.step;
+    let label = 'Дальше', ok = true, hint = '';
+    if (step === 0) label = 'Прочитал(а), понятно';
+    if (step === 1) label = 'Я на месте';
+    if (step === 2) { ok = beforeCount === BEFORE_ZONES.length; if (!ok) hint = 'Осталось фото: ' + (BEFORE_ZONES.length - beforeCount); }
+    if (step === 3) { ok = volOk; if (!ok) hint = s.vol === 'sent' ? 'Ждём ответа клиента' : 'Ответьте на вопрос выше'; }
+    if (step === 4) { ok = checkedCount === checks.length; if (!ok) hint = 'Осталось пунктов: ' + (checks.length - checkedCount); }
+    if (step === 5) { label = 'Завершить и отправить отчёт'; ok = afterCount === ZONES.length; if (!ok) hint = 'Осталось фото: ' + (ZONES.length - afterCount); }
+    const primary = () => { if (!ok) return; if (step === 5) set({ screen: 'done', done: { ...this.state.done, [cur.id]: true }, sheet: null }); else set({ step: step + 1 }); };
+
+    const opt = (on) => 'min-height: 44px; padding: 8px 12px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; ' + (on ? 'background: #8A3A0B; color: #FFFFFF; border: 1px solid #8A3A0B' : 'background: #FFFFFF; color: #17201C; border: 1px solid #D5DDD9');
+    const WHO = [{ id: 'us', label: 'Повредили при уборке' }, { id: 'before', label: 'Было до нас' }];
+    const CATS = [{ id: 'furniture', label: 'Мебель' }, { id: 'tech', label: 'Техника' }, { id: 'finish', label: 'Отделка' }, { id: 'light', label: 'Освещение' }, { id: 'other', label: 'Другое' }];
+    const SHOTS = ['Общий план', 'Крупно', 'Ещё фото'];
+    const dmgCount = SHOTS.filter((x) => s.dmgPhotos[x]).length;
+    const dmgReady = dmgCount >= 2;
+
+    const bubble = (mine) => 'display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; max-width: 88%; ' + (mine ? 'align-self: flex-end; background: #DDF0EC' : 'align-self: flex-start; background: #F3F5F4');
+    const wt = [
+      { who: 'Сергей, менеджер', time: 'пт 18:20', text: 'Балкон из комментария добавил в расчёт, +1 500 ₽. Средство от герметика возьмите.', mine: false },
+      { who: 'Марина, клиент', time: 'сб 10:40', text: 'Можно ещё протереть подоконник на кухне?', mine: false }
+    ];
+    if (s.replied) wt.push({ who: 'Вы', time: 'сб 10:42', text: 'Да, сделаю — он входит в генеральную. Добавила в чек-лист.', mine: true });
+    const sheetTitles = { scope: 'Что в заказе', chat: 'Сообщения по заказу', damage: 'Повреждение на объекте' };
+
+    return {
+      isList: s.screen === 'list', notList: s.screen !== 'list', isOrder: s.screen === 'order', isDone: s.screen === 'done',
+      orders, cur, scope, take: cur.take.map((l) => ({ label: l })), caution: cur.caution, existing: cur.existing,
+      stepNum: step + 1, stepTitle: TITLES[step],
+      segs: TITLES.map((t, i) => ({ style: 'flex: 1; height: 6px; border-radius: 999px; background: ' + (i <= step ? '#0F766E' : '#D5DDD9') })),
+      isBrief: step === 0, isArrive: step === 1, isPhotosBefore: step === 2, isVolume: step === 3, isChecklist: step === 4, isPhotosAfter: step === 5,
+      primary, primaryLabel: label, hasHint: !!hint, hint,
+      primaryStyle: 'width: 100%; height: 56px; border: 0; border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; ' + (ok ? 'background: #0F766E; color: #FFFFFF' : 'background: #DCE3E0; color: #4F5B56'),
+      canPrev: step > 0, prev: () => set({ step: Math.max(0, step - 1) }),
+
+      beforeZones: zones('before', BEFORE_ZONES, false), afterZones: zones('after', ZONES, true),
+      beforeCount, afterCount, beforeTotal: BEFORE_ZONES.length, afterTotal: ZONES.length,
+
+      volAsk: s.vol === 'ask', volEditing: s.vol === 'edit', volSent: s.vol === 'sent', volDone: volOk,
+      volDoneText: s.vol === 'confirmed' ? 'Клиент подтвердил ' + fmt(newTotal) + ' ₽' : 'Объём как в заказе, ' + fmt(total) + ' ₽',
+      area: s.area, windows: s.windows, totalText: fmt(total), newTotalText: fmt(newTotal), finalText: fmt(final),
+      areaMinus: () => set({ area: Math.max(10, s.area - 1) }), areaPlus: () => set({ area: s.area + 1 }),
+      winMinus: () => set({ windows: Math.max(0, s.windows - 1) }), winPlus: () => set({ windows: s.windows + 1 }),
+      volSame: () => set({ vol: 'same', area: cur.area, windows: cur.windows }),
+      volEdit: () => set({ vol: 'edit', area: cur.area + 9, windows: cur.windows + 1 }),
+      sendChange: () => set({ vol: 'sent' }), clientConfirmed: () => set({ vol: 'confirmed' }),
+
+      checks, checkedCount, checkTotal: checks.length,
+
+      showChatFab: cur.hasThread, unread: cur.hasThread && !s.replied, showDamageFab: step >= 2,
+      openChat: () => set({ sheet: 'chat' }), openDamage: () => set({ sheet: 'damage', damage: this.state.damage === 'none' ? 'form' : this.state.damage }), openScope: () => set({ sheet: 'scope' }),
+      closeSheet: () => set({ sheet: null, damage: this.state.damage === 'form' ? 'none' : this.state.damage }),
+      sheetOpen: !!s.sheet, sheetTitle: sheetTitles[s.sheet] || '', sheetScope: s.sheet === 'scope', sheetChat: s.sheet === 'chat', sheetDamage: s.sheet === 'damage',
+
+      wthread: wt.map((m) => ({ ...m, style: bubble(m.mine) })),
+      canReply: !s.replied, reply: () => set({ replied: true }),
+
+      dmgForm: s.damage !== 'sent', dmgSent: s.damage === 'sent',
+      dmgWhoOpts: WHO.map((w) => ({ label: w.label, on: s.dmgWho === w.id, style: opt(s.dmgWho === w.id), pick: () => set({ dmgWho: w.id }) })),
+      dmgCats: CATS.map((c) => ({ label: c.label, on: s.dmgCat === c.id, style: opt(s.dmgCat === c.id), pick: () => set({ dmgCat: c.id }) })),
+      dmgPhotos: SHOTS.map((l) => ({ label: l, on: !!s.dmgPhotos[l], shoot: () => set({ dmgPhotos: { ...this.state.dmgPhotos, [l]: true } }),
+        style: 'height: 76px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 12px; cursor: pointer; ' + (s.dmgPhotos[l] ? 'background: #F2D9C4; color: #6E2E08; border: 1px solid #E3B999' : 'background: #FFF8F2; color: #8A3A0B; border: 1.5px dashed #E3B999') })),
+      dmgPhotoCount: dmgCount,
+      dmgText: s.dmgText, setDmgText: (e) => set({ dmgText: e.target.value }),
+      dmgSendLabel: dmgReady ? 'Отправить руководителю' : 'Сделайте минимум 2 фото',
+      dmgSendStyle: 'height: 52px; border: 0; border-radius: 14px; font-size: 16px; font-weight: 600; cursor: pointer; ' + (dmgReady ? 'background: #8A3A0B; color: #FFFFFF' : 'background: #DCE3E0; color: #4F5B56'),
+      sendDamage: () => { if (dmgReady) set({ damage: 'sent' }); },
+      dmgSummary: WHO.find((w) => w.id === s.dmgWho).label + ' · ' + CATS.find((c) => c.id === s.dmgCat).label + ' · ' + (s.dmgText || 'без описания') + ' · фото: ' + dmgCount,
+
+      payWays: [{ id: 'cash', label: 'Наличными' }, { id: 'sbp', label: 'По СБП' }].map((p) => ({ label: p.label, on: s.payWay === p.id, pick: () => set({ payWay: p.id }),
+        style: 'min-height: 44px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; ' + (s.payWay === p.id ? 'background: #0F766E; color: #FFFFFF; border: 1px solid #0F766E' : 'background: #FFFFFF; color: #17201C; border: 1px solid #D5DDD9') })),
+      payCashOpen: s.payWay === 'cash' && !s.payGot, payCashDone: s.payWay === 'cash' && s.payGot, paySbp: s.payWay === 'sbp',
+      gotCash: () => set({ payGot: true }),
+      toList: () => set({ screen: 'list', sheet: null })
+    };
+  }
+}
+
+mountPrototype(Component, 'tpl', 'app');
+</script>
+</body>
+</html>

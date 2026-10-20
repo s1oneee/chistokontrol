@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ЧистоКонтроль · Клиент</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F766E}a:hover{color:#115E59}
+button,textarea,input{font-family:inherit}
+</style>
+
+<style>
+html,body{margin:0;height:100%;background:#DDE3E0}
+.pt-bar{height:40px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 14px;background:#17201C;color:#FFFFFF;font:500 14px 'Golos Text',system-ui,sans-serif}
+.pt-bar a{color:#9FE3D6;text-decoration:none;font-weight:600}
+.pt-bar span{opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#app{display:flex;justify-content:center}
+#app>div{width:min(100vw,430px)!important;height:calc(100dvh - 40px)!important}
+@media (min-width:600px){
+  #app{padding:24px 0}
+  #app>div{width:390px!important;height:min(844px,calc(100dvh - 88px))!important;border-radius:28px;box-shadow:0 10px 40px rgba(0,0,0,.18)}
+}
+</style>
+</head>
+<body>
+<div class="pt-bar"><a href="index.html">‹ Все экраны</a><span>Клиент · демо</span></div>
+<div id="app"></div>
+<template id="tpl">
+
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #F3F5F4; color: #17201C; font-family: 'Golos Text', system-ui, sans-serif; overflow: hidden">
+
+  <div style="flex-shrink: 0; padding: 14px 16px; background: #FFFFFF; border-bottom: 1px solid #E1E6E3; display: flex; align-items: center; gap: 12px">
+    <div style="width: 40px; height: 40px; border-radius: 12px; background: #0F766E; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px">ВК</div>
+    <div style="display: flex; flex-direction: column; gap: 1px">
+      <div style="font-size: 16px; font-weight: 600">Ваш клининг</div>
+      <div style="font-size: 13px; color: #4F5B56">{{headerSub}}</div>
+    </div>
+  </div>
+
+  <sc-if value="{{isStep}}" hint-placeholder-val="{{true}}">
+    <div style="flex-shrink: 0; padding: 12px 16px 4px; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; font-size: 13px; color: #4F5B56"><span style="font-weight: 600">Шаг {{stepNum}} из 4</span><span>{{stepTitle}}</span></div>
+      <div style="display: flex; gap: 6px">
+        <sc-for list="{{segs}}" as="sg" hint-placeholder-count="3">
+          <div style="{{sg.style}}"></div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isStep1}}" hint-placeholder-val="{{true}}">
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em">Что нужно убрать?</div>
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{types}}" as="t" hint-placeholder-count="4">
+            <button onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="{{t.style}}">{{t.label}}</button>
+          </sc-for>
+        </div>
+        <div style="font-size: 14px; color: #3F4A45; line-height: 1.4">{{typeHint}}</div>
+        <button onClick="{{toggleIncluded}}" aria-expanded="{{showIncluded}}" style="align-self: flex-start; min-height: 40px; padding: 0; border: 0; background: transparent; color: #0F766E; font-size: 15px; font-weight: 600; cursor: pointer">{{includedToggleLabel}}</button>
+        <sc-if value="{{showIncluded}}" hint-placeholder-val="{{false}}">
+          <div style="padding: 12px; border-radius: 12px; background: #F3F5F4; display: flex; flex-direction: column; gap: 6px">
+            <div style="font-size: 14px; font-weight: 600; color: #0F5F58">Входит</div>
+            <sc-for list="{{included}}" as="inc" hint-placeholder-count="4">
+              <div style="display: flex; gap: 8px; align-items: flex-start; font-size: 14px; line-height: 1.35"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg><span><strong style="font-weight: 600">{{inc.zone}}:</strong> {{inc.text}}</span></div>
+            </sc-for>
+            <div style="font-size: 14px; font-weight: 600; color: #8A3A0B; margin-top: 6px">Не входит — можно добавить на следующем шаге</div>
+            <div style="font-size: 14px; color: #3F4A45; line-height: 1.4">{{excluded}}</div>
+          </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{needArea}}" hint-placeholder-val="{{true}}">
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 8px 16px; display: flex; align-items: center; justify-content: space-between; min-height: 64px">
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 600">Площадь</span><span style="font-size: 13px; color: #4F5B56">по документам или примерно</span></div>
+          <div style="display: flex; align-items: center; gap: 6px">
+            <button onClick="{{areaMinus}}" aria-label="Уменьшить площадь" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 20px; color: #0F766E; cursor: pointer">−</button>
+            <span style="min-width: 64px; text-align: center; font-size: 16px; font-weight: 600">{{area}} м²</span>
+            <button onClick="{{areaPlus}}" aria-label="Увеличить площадь" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 20px; color: #0F766E; cursor: pointer">+</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isStep2}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em">Что добавить?</div>
+      <div style="font-size: 15px; color: #3F4A45">Отметьте, если нужно, — или сразу нажмите «Дальше».</div>
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 8px 16px 14px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center; justify-content: space-between; min-height: 56px">
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 600">Окна</span><span style="font-size: 13px; color: #4F5B56">с двух сторон, с рамами</span></div>
+          <div style="display: flex; align-items: center; gap: 6px">
+            <button onClick="{{winMinus}}" aria-label="Меньше окон" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 20px; color: #0F766E; cursor: pointer">−</button>
+            <span style="min-width: 56px; text-align: center; font-size: 16px; font-weight: 600">{{windows}} шт.</span>
+            <button onClick="{{winPlus}}" aria-label="Больше окон" style="width: 44px; height: 44px; border-radius: 12px; border: 1px solid #D5DDD9; background: #FFFFFF; font-size: 20px; color: #0F766E; cursor: pointer">+</button>
+          </div>
+        </div>
+        <sc-if value="{{hasWindows}}" hint-placeholder-val="{{true}}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{winTypes}}" as="w" hint-placeholder-count="2">
+              <button onClick="{{w.pick}}" aria-pressed="{{w.on}}" style="{{w.style}}">{{w.label}}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{extras}}" as="e" hint-placeholder-count="8">
+            <button onClick="{{e.toggle}}" aria-pressed="{{e.on}}" style="{{e.style}}"><span>{{e.label}}</span><span style="font-size: 12px; opacity: 0.85">+{{e.priceText}} ₽</span></button>
+          </sc-for>
+        </div>
+        <button onClick="{{togglePets}}" aria-pressed="{{pets}}" style="{{petsStyle}}"><span>Есть домашние животные</span><span style="font-size: 12px; opacity: 0.85">+500 ₽</span></button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isStep3}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em">Куда и когда приехать?</div>
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="font-size: 16px; font-weight: 600">Где убираем</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{areas}}" as="ar" hint-placeholder-count="2">
+            <button onClick="{{ar.pick}}" aria-pressed="{{ar.on}}" style="{{ar.style}}"><span>{{ar.label}}</span><span style="font-size: 12px; opacity: 0.85">{{ar.note}}</span></button>
+          </sc-for>
+        </div>
+        <label for="addr-street" style="font-size: 16px; font-weight: 600; margin-top: 4px">Адрес</label>
+        <input id="addr-street" value="{{street}}" onChange="{{setStreet}}" placeholder="Улица и дом" style="height: 48px; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 16px; color: #17201C">
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+          <div style="display: flex; flex-direction: column; gap: 4px"><label for="addr-flat" style="font-size: 13px; color: #4F5B56">Квартира</label><input id="addr-flat" value="{{flat}}" onChange="{{setFlat}}" inputmode="numeric" style="height: 48px; min-width: 0; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 16px; color: #17201C"></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><label for="addr-ent" style="font-size: 13px; color: #4F5B56">Подъезд</label><input id="addr-ent" value="{{entrance}}" onChange="{{setEntrance}}" inputmode="numeric" style="height: 48px; min-width: 0; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 16px; color: #17201C"></div>
+          <div style="display: flex; flex-direction: column; gap: 4px"><label for="addr-floor" style="font-size: 13px; color: #4F5B56">Этаж</label><input id="addr-floor" value="{{floor}}" onChange="{{setFloor}}" inputmode="numeric" style="height: 48px; min-width: 0; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 16px; color: #17201C"></div>
+        </div>
+        <span style="font-size: 13px; color: #4F5B56; line-height: 1.4">Точный адрес увидит только исполнитель, назначенный на заказ.</span>
+      </div>
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="font-size: 16px; font-weight: 600">Дата</div>
+        <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px">
+          <sc-for list="{{dates}}" as="d" hint-placeholder-count="5">
+            <button onClick="{{d.pick}}" aria-pressed="{{d.on}}" style="{{d.style}}"><span style="font-size: 12px">{{d.wd}}</span><span style="font-size: 15px; font-weight: 700">{{d.day}}</span></button>
+          </sc-for>
+        </div>
+        <div style="font-size: 16px; font-weight: 600; margin-top: 4px">Время начала</div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+          <sc-for list="{{times}}" as="tm" hint-placeholder-count="6">
+            <button onClick="{{tm.pick}}" aria-pressed="{{tm.on}}" disabled="{{tm.busy}}" style="{{tm.style}}">{{tm.label}}</button>
+          </sc-for>
+        </div>
+        <span style="font-size: 13px; color: #4F5B56; line-height: 1.4">{{durationNote}}</span>
+      </div>
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+        <label for="c-name" style="font-size: 16px; font-weight: 600">Как к вам обращаться</label>
+        <input id="c-name" value="{{cname}}" onChange="{{setCname}}" autocomplete="name" style="height: 48px; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 16px; color: #17201C">
+        <label for="c-phone" style="font-size: 16px; font-weight: 600; margin-top: 4px">Телефон</label>
+        <input id="c-phone" type="tel" value="{{phone}}" onChange="{{setPhone}}" autocomplete="tel" style="height: 48px; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 16px; color: #17201C">
+        <span style="font-size: 13px; color: #4F5B56; line-height: 1.4">Пришлём ссылку на расчёт и статус заказа. Звонить будем только по делу.</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isStep4}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 12px">
+      <div style="font-size: 24px; font-weight: 700; letter-spacing: -0.01em">Детали для исполнителя</div>
+      <div style="font-size: 15px; color: #3F4A45; line-height: 1.4">Всё на этом шаге — по желанию. Но так уборка пройдёт без сюрпризов.</div>
+      <sc-if value="{{demoFilled}}" hint-placeholder-val="{{true}}">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1.5px dashed #8FA39B; font-size: 13px; color: #3F4A45">
+          <span>Поля заполнены для примера</span>
+          <button onClick="{{clearDemo}}" style="height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid #D5DDD9; background: #FFFFFF; color: #0F766E; font-size: 13px; font-weight: 600; cursor: pointer">Очистить</button>
+        </div>
+      </sc-if>
+
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="font-size: 16px; font-weight: 600">Как попасть в квартиру</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{accessOpts}}" as="ac" hint-placeholder-count="3">
+            <button onClick="{{ac.pick}}" aria-pressed="{{ac.on}}" style="{{ac.style}}">{{ac.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <label for="client-comment" style="font-size: 16px; font-weight: 600">Что ещё важно знать</label>
+        <textarea id="client-comment" rows="3" value="{{comment}}" onChange="{{setComment}}" placeholder="Например: кот, не выпускать; аллергия на резкие запахи" style="width: 100%; box-sizing: border-box; padding: 12px; border-radius: 12px; border: 1px solid #C3CEC9; background: #FFFFFF; color: #17201C; font-size: 15px; line-height: 1.4; resize: none"></textarea>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <sc-for list="{{hints}}" as="h" hint-placeholder-count="4">
+            <button onClick="{{h.add}}" style="min-height: 36px; padding: 6px 12px; border-radius: 999px; border: 1px solid #D5DDD9; background: #F7F9F8; color: #17201C; font-size: 13px; cursor: pointer">+ {{h.label}}</button>
+          </sc-for>
+        </div>
+        <div style="font-size: 13px; color: #4F5B56; line-height: 1.4">Если попросите что-то сверх выбранного, менеджер добавит это в расчёт — и вы подтвердите цену заранее.</div>
+      </div>
+
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <label for="fragile-note" style="font-size: 16px; font-weight: 600">Что требует осторожности</label>
+        <textarea id="fragile-note" rows="2" value="{{fragileNote}}" onChange="{{setFragileNote}}" placeholder="Поверхности и вещи, которые нужно мыть особенно аккуратно" style="width: 100%; box-sizing: border-box; padding: 12px; border-radius: 12px; border: 1px solid #C3CEC9; background: #FFFFFF; color: #17201C; font-size: 15px; line-height: 1.4; resize: none"></textarea>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px">
+          <sc-for list="{{fragileHints}}" as="fr" hint-placeholder-count="5">
+            <button onClick="{{fr.add}}" style="min-height: 36px; padding: 6px 12px; border-radius: 999px; border: 1px solid #D5DDD9; background: #F7F9F8; color: #17201C; font-size: 13px; cursor: pointer">+ {{fr.label}}</button>
+          </sc-for>
+        </div>
+        <label for="existing-dmg" style="font-size: 16px; font-weight: 600; margin-top: 6px">Что уже повреждено до уборки</label>
+        <textarea id="existing-dmg" rows="2" value="{{existing}}" onChange="{{setExisting}}" placeholder="Например: скол на столешнице, трещина на плитке" style="width: 100%; box-sizing: border-box; padding: 12px; border-radius: 12px; border: 1px solid #C3CEC9; background: #FFFFFF; color: #17201C; font-size: 15px; line-height: 1.4; resize: none"></textarea>
+        <div style="display: flex; gap: 10px; align-items: center">
+          <sc-if value="{{existingPhoto}}" hint-placeholder-val="{{true}}">
+            <div style="width: 72px; height: 72px; flex-shrink: 0; border-radius: 12px; background: #E4E0D7; color: #4A443A; display: flex; align-items: center; justify-content: center; font-size: 11px; text-align: center">Фото</div>
+          </sc-if>
+          <sc-if value="{{noExistingPhoto}}" hint-placeholder-val="{{false}}">
+            <button onClick="{{addExistingPhoto}}" style="width: 72px; height: 72px; flex-shrink: 0; border-radius: 12px; border: 1.5px dashed #8FA39B; background: #F7F9F8; color: #0F766E; font-size: 13px; font-weight: 600; cursor: pointer">+ Фото</button>
+          </sc-if>
+          <span style="font-size: 13px; color: #4F5B56; line-height: 1.4">Зафиксируем заранее, чтобы потом не было споров</span>
+        </div>
+      </div>
+
+      <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 16px; font-weight: 600">Фото того, что убрать</span><span style="font-size: 13px; color: #4F5B56">{{photoTakenCount}} из {{photoTotal}}</span></div>
+        <div style="font-size: 13px; color: #4F5B56; line-height: 1.4">По фото расчёт будет точнее, а исполнитель возьмёт нужные средства.</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px">
+          <sc-for list="{{photoTargets}}" as="p" hint-placeholder-count="4">
+            <button onClick="{{p.shoot}}" aria-pressed="{{p.on}}" style="{{p.style}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h3l2-3h8l2 3h3v11H3z"></path><circle cx="12" cy="13" r="4"></circle></svg><span>{{p.label}}</span></button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isStep}}" hint-placeholder-val="{{true}}">
+    <div style="flex-shrink: 0; padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #E1E6E3; display: flex; align-items: center; gap: 10px">
+      <sc-if value="{{canBack}}" hint-placeholder-val="{{false}}">
+        <button onClick="{{back}}" aria-label="Назад" style="width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px; border: 1px solid #D5DDD9; background: #FFFFFF; color: #17201C; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg></button>
+      </sc-if>
+      <div style="display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0">
+        <span style="font-size: 13px; color: #4F5B56">Предварительно</span>
+        <span style="font-size: 22px; font-weight: 700">{{totalText}} ₽</span>
+      </div>
+      <button onClick="{{next}}" style="{{nextStyle}}">{{nextLabel}}</button>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isEstimate}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 24px; font-weight: 700">Расчёт стоимости</div>
+        <div style="font-size: 14px; color: #3F4A45">{{addrLine}} · {{whenLine}}</div>
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 4px 16px">
+          <sc-for list="{{lines}}" as="l" hint-placeholder-count="5">
+            <div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #EDF0EE">
+              <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 500">{{l.label}}</span><span style="font-size: 13px; color: #4F5B56">{{l.detail}}</span></div>
+              <span style="font-size: 15px; font-weight: 600; white-space: nowrap">{{l.sumText}} ₽</span>
+            </div>
+          </sc-for>
+          <div style="display: flex; justify-content: space-between; padding: 14px 0"><span style="font-size: 17px; font-weight: 700">Итого</span><span style="font-size: 20px; font-weight: 700">{{totalText}} ₽</span></div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: #DDF0EC; color: #0F4F49; font-size: 14px; line-height: 1.4">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+          <span>Цена не изменится без вашего согласия. Если на месте объём окажется другим, исполнитель покажет фото и новый расчёт.</span>
+        </div>
+        <sc-if value="{{addedFromComment}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; border: 1px solid #E1E6E3">
+            <span style="font-size: 13px; font-weight: 600; color: #4F5B56">Сергей, менеджер · пт 18:20</span>
+            <span style="font-size: 15px; line-height: 1.4">Балкон из вашего комментария добавил в расчёт, +1 500 ₽. Средство от старого герметика возьмём с собой.</span>
+          </div>
+        </sc-if>
+        <button onClick="{{toggleHandoff}}" aria-expanded="{{showHandoff}}" style="min-height: 48px; padding: 0 16px; border-radius: 14px; border: 1px solid #D5DDD9; background: #FFFFFF; color: #17201C; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; justify-content: space-between; align-items: center"><span>Что получит исполнитель</span><span style="color: #0F766E">{{handoffArrow}}</span></button>
+        <sc-if value="{{showHandoff}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.4">
+            <span><strong style="font-weight: 600">Доступ:</strong> {{accessLabel}}</span>
+            <span><strong style="font-weight: 600">Комментарий:</strong> {{commentShown}}</span>
+            <span><strong style="font-weight: 600">Осторожно:</strong> {{fragileShown}}</span>
+            <span><strong style="font-weight: 600">Уже повреждено:</strong> {{existingShown}}</span>
+          </div>
+        </sc-if>
+      </div>
+      <div style="flex-shrink: 0; padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #E1E6E3; display: flex; flex-direction: column; gap: 8px">
+        <button onClick="{{confirmEstimate}}" style="width: 100%; height: 52px; border: 0; border-radius: 14px; background: #0F766E; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Подтверждаю расчёт</button>
+        <button onClick="{{toStep1}}" style="width: 100%; height: 44px; border: 0; background: transparent; color: #0F766E; font-size: 15px; font-weight: 600; cursor: pointer">Изменить заявку</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isStatus}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 24px; font-weight: 700">Ваш заказ</div>
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; align-items: center; gap: 12px">
+          <div style="width: 44px; height: 44px; border-radius: 999px; background: #E3E8E5; display: flex; align-items: center; justify-content: center; font-weight: 600">ОП</div>
+          <div style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 15px; font-weight: 600">Ольга — ваш исполнитель</span><span style="font-size: 13px; color: #4F5B56">{{whenLine}} · {{finalText}} ₽</span></div>
+        </div>
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 14px">
+          <sc-for list="{{steps}}" as="st" hint-placeholder-count="5">
+            <div style="display: flex; align-items: center; gap: 12px">
+              <span style="{{st.dotStyle}}"><sc-if value="{{st.done}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></sc-if></span>
+              <div style="display: flex; flex-direction: column; gap: 1px"><span style="{{st.labelStyle}}">{{st.label}}</span><span style="font-size: 13px; color: #4F5B56">{{st.note}}</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+          <div style="font-size: 16px; font-weight: 600">Сообщения по заказу</div>
+          <sc-for list="{{thread}}" as="m" hint-placeholder-count="2">
+            <div style="{{m.style}}">
+              <span style="font-size: 12px; font-weight: 600; color: #4F5B56">{{m.who}} · {{m.time}}</span>
+              <span style="font-size: 15px; line-height: 1.4">{{m.text}}</span>
+            </div>
+          </sc-for>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input value="{{draft}}" onChange="{{setDraft}}" aria-label="Сообщение компании" placeholder="Задать вопрос…" style="flex: 1; min-width: 0; height: 44px; box-sizing: border-box; padding: 0 12px; border-radius: 12px; border: 1px solid #C3CEC9; font-size: 15px; color: #17201C">
+            <button onClick="{{sendMsg}}" aria-label="Отправить" style="width: 44px; height: 44px; flex-shrink: 0; border: 0; border-radius: 12px; background: #0F766E; color: #FFFFFF; cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></button>
+          </div>
+        </div>
+      </div>
+      <div style="flex-shrink: 0; padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #E1E6E3">
+        <button onClick="{{advance}}" style="width: 100%; height: 48px; border: 1.5px dashed #8FA39B; border-radius: 14px; background: #F7F9F8; color: #3F4A45; font-size: 15px; font-weight: 600; cursor: pointer">{{advanceLabel}}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isChange}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="display: inline-flex; align-self: flex-start; padding: 6px 12px; border-radius: 999px; background: #FDEBDD; color: #8A3A0B; font-size: 13px; font-weight: 600">Нужно ваше подтверждение</div>
+        <div style="font-size: 24px; font-weight: 700; line-height: 1.2">Ольга уточнила объём на месте</div>
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 4px 16px">
+          <sc-for list="{{diff}}" as="d" hint-placeholder-count="2">
+            <div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid #EDF0EE">
+              <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">{{d.label}}</span><span style="font-size: 14px; color: #3F4A45">{{d.from}} → <strong>{{d.to}}</strong></span></div>
+              <span style="font-size: 15px; font-weight: 600; color: #8A3A0B; white-space: nowrap">+{{d.sumText}} ₽</span>
+            </div>
+          </sc-for>
+          <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #EDF0EE"><span style="font-size: 15px; color: #4F5B56">Было в расчёте</span><span style="font-size: 15px; color: #4F5B56">{{totalText}} ₽</span></div>
+          <div style="display: flex; justify-content: space-between; padding: 14px 0"><span style="font-size: 17px; font-weight: 700">Новая сумма</span><span style="font-size: 20px; font-weight: 700">{{newTotalText}} ₽</span></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <div style="height: 96px; border-radius: 12px; background: #E4E0D7; color: #4A443A; display: flex; align-items: center; justify-content: center; font-size: 12px">Лоджия: доп. окно</div>
+          <div style="height: 96px; border-radius: 12px; background: #E4E0D7; color: #4A443A; display: flex; align-items: center; justify-content: center; font-size: 12px">Замер площади</div>
+        </div>
+      </div>
+      <div style="flex-shrink: 0; padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #E1E6E3; display: flex; flex-direction: column; gap: 8px">
+        <button onClick="{{acceptChange}}" style="width: 100%; height: 52px; border: 0; border-radius: 14px; background: #0F766E; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Подтверждаю {{newTotalText}} ₽</button>
+        <button onClick="{{declineChange}}" style="width: 100%; height: 44px; border: 0; background: transparent; color: #8A3A0B; font-size: 15px; font-weight: 600; cursor: pointer">Оставить как в расчёте</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isReport}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 24px; font-weight: 700">Уборка завершена</div>
+        <div style="font-size: 14px; color: #3F4A45">Ольга · на объекте 10:02–14:41 · итог {{finalText}} ₽</div>
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+          <div style="font-size: 16px; font-weight: 600">До и после</div>
+          <sc-for list="{{zones}}" as="z" hint-placeholder-count="3">
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+              <div style="height: 72px; border-radius: 12px; background: #E4E0D7; color: #4A443A; display: flex; align-items: center; justify-content: center; font-size: 12px">{{z.label}} · до</div>
+              <div style="height: 72px; border-radius: 12px; background: #CDE7E1; color: #134E48; display: flex; align-items: center; justify-content: center; font-size: 12px">{{z.label}} · после</div>
+            </div>
+          </sc-for>
+        </div>
+        <button onClick="{{toggleConsent}}" aria-pressed="{{photoConsent}}" style="{{consentStyle}}">
+          <span style="{{consentBoxStyle}}">{{consentMark}}</span>
+          <span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600">Можно показать эти фото на странице компании</span><span style="font-size: 13px; color: #4F5B56; line-height: 1.4">Без адреса и вашего имени. Фото, где видны лица, документы или личные вещи, компания не публикует. Согласие можно отозвать в любой момент.</span></span>
+        </button>
+      </div>
+      <div style="flex-shrink: 0; padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #E1E6E3; display: flex; flex-direction: column; gap: 8px">
+        <button onClick="{{acceptWork}}" style="width: 100%; height: 52px; border: 0; border-radius: 14px; background: #0F766E; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Работа принята</button>
+        <button onClick="{{remarks}}" style="width: 100%; height: 44px; border: 0; background: transparent; color: #0F766E; font-size: 15px; font-weight: 600; cursor: pointer">Есть замечания</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isPay}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+      <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+        <div style="font-size: 24px; font-weight: 700">Оплата</div>
+        <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px">
+          <span style="font-size: 15px; color: #3F4A45">По подтверждённому расчёту</span>
+          <span style="font-size: 22px; font-weight: 700; white-space: nowrap">{{finalText}} ₽</span>
+        </div>
+        <div style="font-size: 16px; font-weight: 600">Как удобнее оплатить</div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <sc-for list="{{payOpts}}" as="po" hint-placeholder-count="2">
+            <button onClick="{{po.pick}}" aria-pressed="{{po.on}}" style="{{po.style}}"><span>{{po.label}}</span><span style="font-size: 12px; opacity: 0.85">{{po.sub}}</span></button>
+          </sc-for>
+        </div>
+        <sc-if value="{{payIsSbp}}" hint-placeholder-val="{{true}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+            <svg width="168" height="168" viewBox="0 0 21 21" role="img" aria-label="QR-код для оплаты по СБП (пример)" style="background: #FFFFFF"><rect x="0" y="0" width="7" height="7" fill="#17201C"></rect><rect x="1" y="1" width="5" height="5" fill="#FFFFFF"></rect><rect x="2" y="2" width="3" height="3" fill="#17201C"></rect><rect x="14" y="0" width="7" height="7" fill="#17201C"></rect><rect x="15" y="1" width="5" height="5" fill="#FFFFFF"></rect><rect x="16" y="2" width="3" height="3" fill="#17201C"></rect><rect x="0" y="14" width="7" height="7" fill="#17201C"></rect><rect x="1" y="15" width="5" height="5" fill="#FFFFFF"></rect><rect x="2" y="16" width="3" height="3" fill="#17201C"></rect><rect x="9" y="1" width="2" height="2" fill="#17201C"></rect><rect x="8" y="4" width="3" height="1" fill="#17201C"></rect><rect x="9" y="8" width="3" height="3" fill="#17201C"></rect><rect x="1" y="9" width="4" height="1" fill="#17201C"></rect><rect x="14" y="9" width="2" height="3" fill="#17201C"></rect><rect x="17" y="10" width="3" height="1" fill="#17201C"></rect><rect x="9" y="14" width="1" height="4" fill="#17201C"></rect><rect x="12" y="15" width="3" height="2" fill="#17201C"></rect><rect x="16" y="14" width="2" height="2" fill="#17201C"></rect><rect x="18" y="17" width="2" height="3" fill="#17201C"></rect><rect x="11" y="19" width="4" height="1" fill="#17201C"></rect></svg>
+            <span style="font-size: 15px; line-height: 1.4">Откройте приложение банка и наведите камеру на QR-код. Сумма подставится сама.</span>
+            <span style="font-size: 13px; color: #4F5B56; line-height: 1.4">Получатель — компания «Ваш клининг». Деньги идут напрямую на её счёт.</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{payIsCash}}" hint-placeholder-val="{{false}}">
+          <div style="background: #FFFFFF; border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.45">
+            <span>Передайте <strong style="font-weight: 600">{{finalText}} ₽</strong> исполнителю Ольге.</span>
+            <span style="color: #3F4A45">Она отметит получение в приложении, а вам придёт подтверждение от компании.</span>
+          </div>
+        </sc-if>
+      </div>
+      <div style="flex-shrink: 0; padding: 12px 16px 20px; background: #FFFFFF; border-top: 1px solid #E1E6E3">
+        <button onClick="{{confirmPay}}" style="width: 100%; height: 52px; border: 0; border-radius: 14px; background: #0F766E; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">{{payBtnLabel}}</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{isFinal}}" hint-placeholder-val="{{false}}">
+    <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 28px 16px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center">
+      <div style="width: 72px; height: 72px; flex-shrink: 0; border-radius: 999px; background: #0F766E; display: flex; align-items: center; justify-content: center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"></path></svg></div>
+      <div style="font-size: 24px; font-weight: 700">{{finalTitle}}</div>
+      <div style="font-size: 16px; color: #3F4A45; line-height: 1.45; max-width: 310px">{{finalNote}}</div>
+      <button onClick="{{restart}}" style="height: 48px; padding: 0 20px; margin-top: 8px; border: 1px solid #D5DDD9; border-radius: 14px; background: #FFFFFF; color: #0F766E; font-size: 15px; font-weight: 600; cursor: pointer">Начать демо заново</button>
+    </div>
+  </sc-if>
+
+</div>
+</template>
+<script>window.__PAGE_MAP__ = {"Main":"client.html","Worker":"worker.html","Owner":"owner.html","Company":"company.html"};</script>
+<script src="runtime.js"></script>
+<script>
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = this.initial();
+  }
+  initial() {
+    return {
+      screen: 'step1', type: 'gen', area: 55, windows: 4, winType: 'std', extras: { oven: true, fridge: true }, pets: true, showIncluded: false, showHandoff: false,
+      access: 'concierge', comment: 'Кот — не выпускать на лестницу. На плитке в ванной остатки старого герметика. Если получится, помойте и балкон.',
+      fragileNote: 'Глянцевые фасады на кухне.', existing: 'Скол на столешнице у мойки.', existingPhoto: true, photoTaken: { 'Кухня': true, 'Санузел': true }, demoFilled: true,
+      photoConsent: false,
+      payMethod: 'sbp', addedFromComment: false, phase: 1, changeAccepted: false, remarks: false, draft: '', messages: [],
+      zone: 'city', street: 'ул. Республики, 92', flat: '41', entrance: '3', floor: '7', date: 'sat', time: '10:00', cname: 'Марина', phone: '+7 912 000-00-00'
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const set = (p) => this.setState(p);
+    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const MIN = 3000;
+    const TYPES = [
+      { id: 'gen', label: 'Генеральная', rate: 170 },
+      { id: 'sup', label: 'Поддерживающая', rate: 100 },
+      { id: 'rem', label: 'После ремонта', rate: 200 },
+      { id: 'none', label: 'Только отдельные услуги', rate: 0 }
+    ];
+    const EXTRAS = [
+      { id: 'oven', label: 'Духовка', price: 900, detail: 'внутри, стекло, противень' },
+      { id: 'fridge', label: 'Холодильник', price: 900, detail: 'полки, ящики, уплотнитель' },
+      { id: 'micro', label: 'Микроволновка', price: 600, detail: 'внутри и снаружи' },
+      { id: 'hood', label: 'Вытяжка', price: 700, detail: 'корпус и фильтр' },
+      { id: 'balcony', label: 'Балкон', price: 1500, detail: 'пол, рамы, подоконник' },
+      { id: 'lamp', label: 'Люстра', price: 800, detail: 'плафоны и подвесы' },
+      { id: 'move', label: 'Сдвинуть мебель', price: 1000, detail: 'помыть под и за ней' },
+      { id: 'cabinets', label: 'Шкафы внутри', price: 1500, detail: 'вещи вынуть и вернуть' }
+    ];
+    const WIN = { std: { label: 'Стандартные', price: 600 }, pano: { label: 'Панорамные', price: 1500 } };
+    const INCLUDED = {
+      sup: { hint: 'Подходит, если в квартире уже чисто и нужно поддерживать порядок. Обычно раз в 1–2 недели. Исполнитель пробудет у вас примерно 2–3 часа.', items: [
+        { zone: 'Комнаты', text: 'пыль с открытых поверхностей, зеркала' },
+        { zone: 'Кухня', text: 'столешница, плита сверху, раковина, фасады снаружи' },
+        { zone: 'Санузел', text: 'ванна, унитаз, раковина, зеркало' },
+        { zone: 'Полы', text: 'пылесос и влажная уборка в открытых местах' }
+      ], excluded: 'окна, техника и шкафы внутри, стены, места за мебелью' },
+      gen: { hint: 'Подходит, если давно не убирались тщательно, перед праздником, после жильцов. Исполнитель пробудет у вас примерно 4–6 часов.', items: [
+        { zone: 'Комнаты', text: 'пыль везде: верх шкафов, плинтусы, батареи, карнизы, подоконники' },
+        { zone: 'Мелочи', text: 'двери и ручки, выключатели, розетки, светильники снаружи' },
+        { zone: 'Кухня', text: 'фартук и швы, фасады, верх шкафов, вытяжка снаружи' },
+        { zone: 'Санузел', text: 'плитка и швы, за унитазом, налёт и известь' },
+        { zone: 'Полы', text: 'везде, где открыт пол, и под лёгкой мебелью' }
+      ], excluded: 'окна, техника и шкафы внутри, за тяжёлой мебелью, выше 2,5 м, люстры, балкон' },
+      rem: { hint: 'Подходит, если после ремонта остались строительная пыль и следы материалов. Исполнитель пробудет у вас примерно 6–8 часов.', items: [
+        { zone: 'Всё из генеральной', text: 'по всей квартире' },
+        { zone: 'Строительная пыль', text: 'со стен, потолков, мебели — в несколько проходов' },
+        { zone: 'Следы ремонта', text: 'краска, затирка, клей, скотч, плёнка' },
+        { zone: 'Сантехника', text: 'цементный налёт, остатки герметика' }
+      ], excluded: 'окна, вывоз строительного мусора, химчистка мебели' },
+      none: { hint: 'Если нужна не вся квартира, а что-то одно: окна, духовка, балкон. Выберете на следующем шаге. Минимальный заказ — 3 000 ₽.', items: [
+        { zone: 'Только то, что отметите', text: 'окна, техника, балкон и другие услуги' }
+      ], excluded: 'общая уборка комнат, кухни, санузла и полов' }
+    };
+    const chip = (on) => 'min-height: 48px; padding: 8px 12px; border-radius: 12px; font-size: 15px; font-weight: 500; cursor: pointer; text-align: left; ' + (on ? 'background: #0F766E; color: #FFFFFF; border: 1px solid #0F766E' : 'background: #FFFFFF; color: #17201C; border: 1px solid #D5DDD9');
+    const tile = (on) => chip(on) + '; display: flex; flex-direction: column; align-items: flex-start; gap: 2px';
+    const type = TYPES.find((t) => t.id === s.type);
+
+    const calc = (area, windows) => {
+      const lines = type.rate ? [{ label: type.label + ' уборка', detail: area + ' м² × ' + type.rate + ' ₽', sum: area * type.rate }] : [];
+      if (windows > 0) lines.push({ label: 'Мытьё окон', detail: windows + ' шт. · ' + WIN[s.winType].label.toLowerCase(), sum: windows * WIN[s.winType].price });
+      EXTRAS.forEach((e) => { if (s.extras[e.id]) lines.push({ label: e.label, detail: (e.id === 'balcony' && s.addedFromComment) ? 'добавлено по вашему комментарию' : e.detail, sum: e.price }); });
+      if (s.pets) lines.push({ label: 'Уборка за питомцем', detail: 'шерсть, лоток, лежанка', sum: 500 });
+      if (s.zone === 'out') lines.push({ label: 'Выезд за город', detail: 'Тюменский район и посёлки', sum: 1000 });
+      const sub = lines.reduce((a, l) => a + l.sum, 0);
+      if (sub > 0 && sub < MIN) lines.push({ label: 'До минимального заказа', detail: 'минимальный заказ ' + fmt(MIN) + ' ₽', sum: MIN - sub });
+      return lines;
+    };
+    const lines = calc(s.area, s.windows);
+    const total = lines.reduce((a, l) => a + l.sum, 0);
+    const newArea = s.area + 9;
+    const newWin = s.windows + 1;
+    const newTotal = calc(newArea, newWin).reduce((a, l) => a + l.sum, 0);
+    const final = s.changeAccepted ? newTotal : total;
+
+    const TARGETS = (s.type !== 'none' ? ['Кухня', 'Санузел', 'Комната'] : []).concat(s.windows > 0 ? ['Окна'] : []).concat(EXTRAS.filter((e) => s.extras[e.id] && e.id !== 'move' && e.id !== 'cabinets').map((e) => e.label));
+    const ACCESS = [{ id: 'home', label: 'Буду дома' }, { id: 'concierge', label: 'Ключи у консьержа' }, { id: 'chat', label: 'Договоримся в чате' }];
+    const HINTS = ['Кот — не выпускать', 'Аллергия на резкие запахи', 'Не трогать вещи на столе', 'Старый герметик на плитке'];
+    const FRAGILE = ['Натуральный камень', 'Глянцевые фасады', 'Паркет или массив', 'Новые обои', 'Дорогая техника'];
+    const append = (key, label) => { const c = (this.state[key] || '').trim(); set({ [key]: c ? c.replace(/[.\s]*$/, '') + '. ' + label + '.' : label + '.' }); };
+
+    const bubble = (mine) => 'display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; max-width: 88%; ' + (mine ? 'align-self: flex-end; background: #DDF0EC' : 'align-self: flex-start; background: #F3F5F4');
+    const base = [{ who: 'Сергей, менеджер', time: 'пт 18:20', text: s.addedFromComment ? 'Балкон из вашего комментария добавил в расчёт, +1 500 ₽.' : 'Заказ принят. Ольга приедет в субботу к 10:00.', mine: false }];
+    if (s.phase >= 2) {
+      base.push({ who: 'Вы', time: 'сб 10:40', text: 'Можно ещё протереть подоконник на кухне?', mine: true });
+      base.push({ who: 'Ольга, исполнитель', time: 'сб 10:42', text: 'Да, сделаю — он входит в генеральную. Добавила в чек-лист.', mine: false });
+    }
+    const thread = base.concat(s.messages.map((t) => ({ who: 'Вы', time: 'сейчас', text: t, mine: true }))).map((m) => ({ ...m, style: bubble(m.mine) }));
+
+    const dot = (st) => 'width: 26px; height: 26px; flex-shrink: 0; border-radius: 999px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; ' + (st === 'done' ? 'background: #0F766E' : st === 'now' ? 'background: #FFFFFF; border: 3px solid #0F766E' : 'background: #FFFFFF; border: 2px solid #C3CEC9');
+    const phase = s.phase;
+    const steps = [
+      { label: 'Расчёт подтверждён', note: fmt(total) + ' ₽', at: 0 },
+      { label: 'Исполнитель назначен', note: 'Ольга, сб 10:00', at: 0 },
+      { label: 'Исполнитель на месте', note: phase >= 2 ? 'прибыла в 10:02' : 'ожидается в 10:00', at: 1 },
+      { label: 'Уборка', note: phase >= 2 ? (s.changeAccepted ? 'объём уточнён, ' + fmt(newTotal) + ' ₽' : 'по расчёту') : 'по чек-листу из заказа', at: 2 },
+      { label: 'Фотоотчёт и приёмка', note: 'вы получите ссылку', at: 3 }
+    ].map((d) => {
+      const st = d.at < phase ? 'done' : d.at === phase ? 'now' : 'todo';
+      return { label: d.label, note: d.note, done: st === 'done', dotStyle: dot(st), labelStyle: 'font-size: 15px; font-weight: ' + (st === 'todo' ? '500; color: #4F5B56' : '600; color: #17201C') };
+    });
+
+    const stepIdx = { step1: 1, step2: 2, step3: 3, step4: 4 }[s.screen] || 0;
+    const stepTitles = { 1: 'Что убрать', 2: 'Дополнительно', 3: 'Куда и когда', 4: 'Детали' };
+    const DATES = [{ id: 'sat', wd: 'сб', day: '19 окт' }, { id: 'sun', wd: 'вс', day: '20 окт' }, { id: 'mon', wd: 'пн', day: '21 окт' }, { id: 'tue', wd: 'вт', day: '22 окт' }, { id: 'wed', wd: 'ср', day: '23 окт' }];
+    const BUSY = { sat: ['09:00', '14:00'], sun: ['10:00', '12:00'], mon: [], tue: ['18:00'], wed: [] };
+    const TIMES = ['09:00', '10:00', '12:00', '14:00', '16:00', '18:00'];
+    const DUR = { gen: '4–6 часов', sup: '2–3 часа', rem: '6–8 часов', none: '1–2 часа' };
+    const digits = (s.phone || '').replace(/\D/g, '').length;
+    const addrOk = !!(s.street || '').trim() && !!(s.cname || '').trim() && digits >= 10;
+    const dObj = DATES.find((d) => d.id === s.date);
+    const whenLine = dObj.wd + ', ' + dObj.day + ', ' + s.time;
+    const addrLine = (s.street || 'адрес не указан') + ((s.flat || '').trim() ? ', кв. ' + s.flat : '');
+    const blockedNext = stepIdx === 3 && !addrOk;
+    const toEstimate = () => {
+      const c = (this.state.comment || '').toLowerCase();
+      if (c.includes('балкон') && !this.state.extras.balcony) set({ screen: 'estimate', extras: { ...this.state.extras, balcony: true }, addedFromComment: true });
+      else set({ screen: 'estimate' });
+    };
+    const headers = { step1: 'заявка на уборку', step2: 'заявка на уборку', step3: 'заявка на уборку', step4: 'заявка на уборку', estimate: 'расчёт стоимости', status: 'статус заказа', change: 'изменение объёма', report: 'фотоотчёт', pay: 'оплата', final: 'заказ закрыт' };
+    const accessLabel = ACCESS.find((a) => a.id === s.access).label;
+
+    return {
+      headerSub: headers[s.screen],
+      isStep: stepIdx > 0, isStep1: s.screen === 'step1', isStep2: s.screen === 'step2', isStep3: s.screen === 'step3',
+      isEstimate: s.screen === 'estimate', isStatus: s.screen === 'status', isChange: s.screen === 'change', isReport: s.screen === 'report', isFinal: s.screen === 'final',
+      stepNum: stepIdx, stepTitle: stepTitles[stepIdx] || '',
+      segs: [1, 2, 3, 4].map((i) => ({ style: 'flex: 1; height: 6px; border-radius: 999px; background: ' + (i <= stepIdx ? '#0F766E' : '#D5DDD9') })),
+      canBack: stepIdx > 1,
+      back: () => set({ screen: 'step' + Math.max(1, stepIdx - 1) }),
+      next: () => { if (blockedNext) return; if (stepIdx < 4) set({ screen: 'step' + (stepIdx + 1) }); else toEstimate(); },
+      nextLabel: blockedNext ? 'Адрес, имя, телефон' : stepIdx === 4 ? 'Получить расчёт' : 'Дальше',
+      nextStyle: 'height: 52px; padding: 0 18px; border: 0; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; ' + (blockedNext ? 'background: #DCE3E0; color: #4F5B56' : 'background: #0F766E; color: #FFFFFF'),
+      isStep4: s.screen === 'step4',
+      areas: [{ id: 'city', label: 'Тюмень', note: 'без доплаты' }, { id: 'out', label: 'За городом', note: 'Тюменский р-н, +1 000 ₽' }].map((z) => ({ label: z.label, note: z.note, on: s.zone === z.id, pick: () => set({ zone: z.id }),
+        style: tile(s.zone === z.id) })),
+      street: s.street, setStreet: (e) => set({ street: e.target.value }),
+      flat: s.flat, setFlat: (e) => set({ flat: e.target.value }),
+      entrance: s.entrance, setEntrance: (e) => set({ entrance: e.target.value }),
+      floor: s.floor, setFloor: (e) => set({ floor: e.target.value }),
+      cname: s.cname, setCname: (e) => set({ cname: e.target.value }),
+      phone: s.phone, setPhone: (e) => set({ phone: e.target.value }),
+      dates: DATES.map((d) => ({ wd: d.wd, day: d.day, on: s.date === d.id, pick: () => set({ date: d.id, time: (BUSY[d.id].includes(this.state.time) ? TIMES.find((t) => !BUSY[d.id].includes(t)) : this.state.time) }),
+        style: 'min-height: 56px; padding: 6px 2px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; cursor: pointer; ' + (s.date === d.id ? 'background: #0F766E; color: #FFFFFF; border: 1px solid #0F766E' : 'background: #FFFFFF; color: #17201C; border: 1px solid #D5DDD9') })),
+      times: TIMES.map((t) => { const busy = BUSY[s.date].includes(t); const on = !busy && s.time === t;
+        return { label: busy ? t + ' · занято' : t, on, busy, pick: () => { if (!busy) set({ time: t }); },
+          style: 'min-height: 44px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: ' + (busy ? 'default' : 'pointer') + '; ' + (busy ? 'background: #F3F5F4; color: #6B7570; border: 1px dashed #C3CEC9; font-weight: 500; font-size: 12px' : on ? 'background: #0F766E; color: #FFFFFF; border: 1px solid #0F766E' : 'background: #FFFFFF; color: #17201C; border: 1px solid #D5DDD9') }; }),
+      durationNote: 'Уборка займёт примерно ' + DUR[s.type] + '. Занятое время уже забронировано другими клиентами.',
+      whenLine, addrLine,
+
+      types: TYPES.map((t) => ({ label: t.label, on: s.type === t.id, style: chip(s.type === t.id), pick: () => set({ type: t.id }) })),
+      typeHint: INCLUDED[s.type].hint, included: INCLUDED[s.type].items, excluded: INCLUDED[s.type].excluded,
+      showIncluded: s.showIncluded, toggleIncluded: () => set({ showIncluded: !s.showIncluded }),
+      includedToggleLabel: s.showIncluded ? 'Скрыть, что входит ▴' : 'Что входит в уборку ▾',
+      needArea: s.type !== 'none', area: s.area,
+      areaMinus: () => set({ area: Math.max(20, s.area - 5) }), areaPlus: () => set({ area: s.area + 5 }),
+
+      windows: s.windows, hasWindows: s.windows > 0,
+      winMinus: () => set({ windows: Math.max(0, s.windows - 1) }), winPlus: () => set({ windows: s.windows + 1 }),
+      winTypes: Object.keys(WIN).map((k) => ({ label: WIN[k].label + ' · ' + fmt(WIN[k].price) + ' ₽', on: s.winType === k, style: chip(s.winType === k), pick: () => set({ winType: k }) })),
+      extras: EXTRAS.map((e) => ({ label: e.label, priceText: fmt(e.price), on: !!s.extras[e.id], style: tile(!!s.extras[e.id]), toggle: () => set({ extras: { ...this.state.extras, [e.id]: !this.state.extras[e.id] } }) })),
+      pets: s.pets, petsStyle: tile(s.pets) + '; width: 100%; flex-direction: row; justify-content: space-between; align-items: center', togglePets: () => set({ pets: !s.pets }),
+
+      demoFilled: s.demoFilled,
+      clearDemo: () => set({ comment: '', fragileNote: '', existing: '', existingPhoto: false, photoTaken: {}, demoFilled: false }),
+      accessOpts: ACCESS.map((a) => ({ label: a.label, on: s.access === a.id, style: chip(s.access === a.id), pick: () => set({ access: a.id }) })),
+      comment: s.comment, setComment: (e) => set({ comment: e.target.value }),
+      hints: HINTS.map((label) => ({ label, add: () => append('comment', label) })),
+      fragileNote: s.fragileNote, setFragileNote: (e) => set({ fragileNote: e.target.value }),
+      fragileHints: FRAGILE.map((label) => ({ label, add: () => append('fragileNote', label) })),
+      existing: s.existing, setExisting: (e) => set({ existing: e.target.value }),
+      existingPhoto: s.existingPhoto, noExistingPhoto: !s.existingPhoto, addExistingPhoto: () => set({ existingPhoto: true }),
+      photoTargets: TARGETS.map((label) => {
+        const on = !!s.photoTaken[label];
+        return { label, on, shoot: () => set({ photoTaken: { ...this.state.photoTaken, [label]: !this.state.photoTaken[label] } }),
+          style: 'width: 80px; height: 76px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; font-size: 11px; cursor: pointer; text-align: center; padding: 4px; box-sizing: border-box; ' + (on ? 'background: #E4E0D7; color: #4A443A; border: 1px solid #CFC8B9' : 'background: #F7F9F8; color: #0F766E; border: 1.5px dashed #8FA39B') };
+      }),
+      photoTotal: TARGETS.length, photoTakenCount: TARGETS.filter((t) => s.photoTaken[t]).length,
+
+      lines: lines.map((l) => ({ ...l, sumText: fmt(l.sum) })),
+      totalText: fmt(total), newTotalText: fmt(newTotal), finalText: fmt(final),
+      addedFromComment: s.addedFromComment,
+      showHandoff: s.showHandoff, toggleHandoff: () => set({ showHandoff: !s.showHandoff }), handoffArrow: s.showHandoff ? '▴' : '▾',
+      accessLabel,
+      commentShown: (s.comment || '').trim() || '—', fragileShown: (s.fragileNote || '').trim() || '—',
+      existingShown: ((s.existing || '').trim() || '—') + (s.existingPhoto && (s.existing || '').trim() ? ' (есть фото)' : ''),
+      confirmEstimate: () => set({ screen: 'status', phase: 1 }),
+      toStep1: () => set({ screen: 'step1' }),
+
+      steps, thread,
+      draft: s.draft, setDraft: (e) => set({ draft: e.target.value }),
+      sendMsg: () => { const t = (this.state.draft || '').trim(); if (t) set({ messages: this.state.messages.concat([t]), draft: '' }); },
+      advanceLabel: phase === 1 ? 'Демо: Ольга приехала на объект →' : 'Демо: уборка закончена →',
+      advance: () => (phase === 1 ? set({ screen: 'change', phase: 2 }) : set({ screen: 'report', phase: 3 })),
+
+      diff: [
+        { label: 'Площадь', from: s.area + ' м²', to: newArea + ' м²', sumText: fmt(9 * type.rate) },
+        { label: 'Окна', from: s.windows + ' шт.', to: newWin + ' шт. (окно на лоджии)', sumText: fmt(WIN[s.winType].price) }
+      ],
+      acceptChange: () => set({ changeAccepted: true, screen: 'status' }),
+      declineChange: () => set({ changeAccepted: false, screen: 'status' }),
+
+      zones: TARGETS.map((label) => ({ label })),
+      acceptWork: () => set({ screen: 'pay', remarks: false }),
+      isPay: s.screen === 'pay', payIsSbp: s.payMethod === 'sbp', payIsCash: s.payMethod === 'cash',
+      payOpts: [{ id: 'sbp', label: 'Перевод по СБП', sub: 'QR-код компании' }, { id: 'cash', label: 'Наличными', sub: 'исполнителю на месте' }].map((p) => ({ label: p.label, sub: p.sub, on: s.payMethod === p.id, style: tile(s.payMethod === p.id), pick: () => set({ payMethod: p.id }) })),
+      payBtnLabel: s.payMethod === 'sbp' ? 'Я оплатил(а)' : 'Отдам наличными',
+      confirmPay: () => set({ screen: 'final' }),
+      remarks: () => set({ screen: 'final', remarks: true }),
+      finalTitle: s.remarks ? 'Замечание отправлено' : 'Спасибо!',
+      finalNote: s.remarks ? 'Ольга ещё на объекте и исправит замечание. Руководитель тоже получил уведомление.' : (s.payMethod === 'sbp' ? 'Работа принята и оплачена по СБП: ' + fmt(final) + ' ₽ — ровно то, что вы подтвердили. Чек пришлёт компания.' : 'Работа принята. Передайте Ольге ' + fmt(final) + ' ₽ — после её отметки придёт подтверждение и чек.'),
+      photoConsent: s.photoConsent,
+      toggleConsent: () => set({ photoConsent: !this.state.photoConsent }),
+      consentMark: s.photoConsent ? '✓' : '',
+      consentStyle: 'width: 100%; padding: 14px 16px; border-radius: 16px; display: flex; align-items: flex-start; gap: 12px; text-align: left; cursor: pointer; color: #17201C; ' + (s.photoConsent ? 'background: #FFFFFF; border: 1.5px solid #0F766E' : 'background: #FFFFFF; border: 1px solid #D5DDD9'),
+      consentBoxStyle: 'width: 24px; height: 24px; flex-shrink: 0; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; ' + (s.photoConsent ? 'background: #0F766E; color: #FFFFFF; border: 1.5px solid #0F766E' : 'background: #FFFFFF; color: #FFFFFF; border: 1.5px solid #8FA39B'),
+      restart: () => this.setState(this.initial())
+    };
+  }
+}
+
+mountPrototype(Component, 'tpl', 'app');
+</script>
+</body>
+</html>

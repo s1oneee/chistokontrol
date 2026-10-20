@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ЧистоКонтроль · прототип</title>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F3F5F4;color:#17201C;font-family:'Golos Text',system-ui,sans-serif}
+main{max-width:520px;margin:0 auto;padding:32px 16px 40px;display:flex;flex-direction:column;gap:16px}
+h1{margin:0;font-size:28px;line-height:1.2}
+p{margin:0;font-size:16px;line-height:1.5;color:#3F4A45}
+.list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.card{display:flex;align-items:center;gap:14px;min-height:72px;padding:12px 16px;border-radius:16px;background:#FFFFFF;color:#17201C;text-decoration:none;border:1px solid #E1E6E3}
+.card:hover{border-color:#9FCFC4}
+.num{width:36px;height:36px;flex-shrink:0;border-radius:999px;background:#DDF0EC;color:#0F5F58;display:flex;align-items:center;justify-content:center;font-weight:700}
+.txt{flex:1;display:flex;flex-direction:column;gap:2px}
+.t{font-size:17px;font-weight:600}
+.s{font-size:14px;color:#4F5B56}
+.arr{font-size:22px;color:#4F5B56}
+.note{padding:12px 14px;border-radius:14px;background:#DDF0EC;color:#0F4F49;font-size:14px;line-height:1.45}
+</style>
+</head>
+<body>
+<main>
+  <h1>ЧистоКонтроль</h1>
+  <p>Клиент заранее видит, что входит в уборку и сколько это стоит. Исполнитель получает тот же список. Всё, что меняется на месте, фиксируется с фото и подтверждается клиентом.</p>
+  <div class="list">
+      <a class="card" href="client.html"><span class="num">1</span><span class="txt"><span class="t">Клиент</span><span class="s">Заявка, расчёт, приёмка и оплата</span></span><span class="arr">›</span></a>
+      <a class="card" href="worker.html"><span class="num">2</span><span class="txt"><span class="t">Исполнитель</span><span class="s">Заказ по шагам: фото, объём, чек-лист</span></span><span class="arr">›</span></a>
+      <a class="card" href="owner.html"><span class="num">3</span><span class="txt"><span class="t">Владелец</span><span class="s">Сегодня, заявки, команда, итоги</span></span><span class="arr">›</span></a>
+      <a class="card" href="company.html"><span class="num">4</span><span class="txt"><span class="t">Страница компании</span><span class="s">Ссылка для Авито: услуги, цены, заявка</span></span><span class="arr">›</span></a>
+  </div>
+  <div class="note">Это кликабельный макет, а не готовая программа. Нажимайте на всё — данные выдуманные и нигде не сохраняются. Экраны не связаны между собой: в настоящем сервисе у всех будет один общий заказ.</div>
+</main>
+</body>
+</html>
